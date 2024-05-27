@@ -1,0 +1,18 @@
+{
+  "name": "verification-bot",
+  "version": "1.0.0",
+  "description": "A Discord bot for user verification and role assignment",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "discord.js": "^14.15.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.1"
+  }
+}
