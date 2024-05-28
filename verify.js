@@ -39,7 +39,7 @@ module.exports = async (client, source, args = []) => {
         learning_tamazight: source.options.getBoolean('learning_tamazight'),
       };
     } else { // Prefix command
-      if (source.channel.id !== config.allowedChannelId) return;
+      if (source.channel.id !== process.env.ALLOWED_CHANNEL_ID) return;
       const userIdOrMention = args[0];
       targetMember = await resolveMember(source, userIdOrMention);
       author = source.author;
@@ -51,7 +51,7 @@ module.exports = async (client, source, args = []) => {
       return reply(`No user found matching ${args[0]}`);
     }
 
-    if (!targetMember.roles.cache.has(config.nonVerifiedRoleId)) {
+    if (!targetMember.roles.cache.has(process.env.NON_VERIFIED_ROLE_ID)) {
       return reply('This user is already verified.');
     }
 
@@ -60,7 +60,7 @@ module.exports = async (client, source, args = []) => {
       return reply('You do not have permission to use this command.');
     }
 
-    await targetMember.roles.remove(config.nonVerifiedRoleId);
+    await targetMember.roles.remove(process.env.NON_VERIFIED_ROLE_ID);
 
     const assignedRoles = [];
     for (const [roleName, roleId] of Object.entries(roleMapping)) {
@@ -96,7 +96,7 @@ async function resolveMember(message, userIdOrMention) {
 }
 
 async function sendVerificationReport(source, targetMember, author, assignedRoles) {
-  const reportChannel = await source.client.channels.fetch(config.reportChannelId);
+  const reportChannel = await source.client.channels.fetch(process.env.REPORT_CHANNEL_ID);
   if (!reportChannel) return console.error('Report channel not found');
 
   const embed = new EmbedBuilder()

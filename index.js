@@ -1,3 +1,4 @@
+require('dotenv').config();
 const { Client, GatewayIntentBits, REST, Routes } = require('discord.js');
 const config = require('./config.json');
 
@@ -37,7 +38,7 @@ client.on('interactionCreate', async interaction => {
   }
 });
 
-client.login(config.token);
+client.login(process.env.DISCORD_TOKEN);
 
 async function registerSlashCommands() {
   const commands = [
@@ -109,12 +110,12 @@ async function registerSlashCommands() {
     },
   ];
 
-  const rest = new REST({ version: '10' }).setToken(config.token);
+  const rest = new REST({ version: '10' }).setToken(process.env.DISCORD_TOKEN);
 
   try {
     console.log('Started refreshing application (/) commands.');
 
-    await rest.put(Routes.applicationGuildCommands(client.user.id, config.guildId), {
+    await rest.put(Routes.applicationGuildCommands(client.user.id, process.env.GUILD_ID), {
       body: commands,
     });
 
