@@ -13,6 +13,8 @@ const roleMapping = {
   learning_tamazight: '1201138020569600000',
 };
 
+const verificationData = {}; // In-memory storage for verification details
+
 module.exports = async (client, source, args = []) => {
   let targetMember;
   let author;
@@ -65,6 +67,17 @@ module.exports = async (client, source, args = []) => {
     }
   }
 
+  const verificationDetails = {
+    user: targetMember.user.tag,
+    userId: targetMember.user.id,
+    verifiedBy: author.tag,
+    verifiedById: author.id,
+    date: new Date().toLocaleString(),
+    assignedRoles,
+  };
+
+  verificationData[targetMember.user.id] = verificationDetails; // Store verification details
+
   await sendVerificationReport(source, targetMember, author, assignedRoles);
   reply(`Successfully verified ${targetMember.user.username}`);
 };
@@ -100,3 +113,5 @@ async function sendVerificationReport(source, targetMember, author, assignedRole
 
   await reportChannel.send({ embeds: [embed] });
 }
+
+module.exports.verificationData = verificationData; // Export verification data

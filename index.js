@@ -1,3 +1,4 @@
+require('dotenv').config();
 const { Client, GatewayIntentBits, REST, Routes } = require('discord.js');
 const config = require('./config.json');
 
@@ -34,10 +35,12 @@ client.on('interactionCreate', async interaction => {
 
   if (commandName === 'verify') {
     require('./verify')(client, interaction);
+  } else if (commandName === 'whoverified') {
+    require('./whoverified')(client, interaction);
   }
 });
 
-client.login(config.token);
+client.login(process.env.DISCORD_TOKEN);
 
 async function registerSlashCommands() {
   const commands = [
@@ -116,9 +119,21 @@ async function registerSlashCommands() {
         }
       ],
     },
+    {
+      name: 'whoverified',
+      description: 'Check who verified a user',
+      options: [
+        {
+          name: 'user',
+          description: 'The user to check',
+          type: 6, // USER type
+          required: true,
+        }
+      ],
+    }
   ];
 
-  const rest = new REST({ version: '10' }).setToken(config.token);
+  const rest = new REST({ version: '10' }).setToken(process.env.DISCORD_TOKEN);
 
   try {
     console.log('Started refreshing application (/) commands.');
