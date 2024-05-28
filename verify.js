@@ -77,9 +77,22 @@ module.exports = async (client, source, args = []) => {
     assignedRoles,
   };
 
-  verificationData[targetMember.user.id] = verificationDetails; // Store verification details
+  const embed = new EmbedBuilder()
+    .setTitle('User Verified')
+    .setDescription(`A user has been verified.`)
+    .addFields(
+      { name: 'User', value: `${verificationDetails.user} (${verificationDetails.userId})`, inline: true },
+      { name: 'Verified By', value: `${verificationDetails.verifiedBy} (${verificationDetails.verifiedById})`, inline: true },
+      { name: 'Date', value: verificationDetails.date, inline: true },
+      { name: 'Assigned Roles', value: assignedRoles.length > 0 ? assignedRoles.join(', ') : 'None', inline: false }
+    )
+    .setThumbnail(targetMember.user.displayAvatarURL({ dynamic: true }))
+    .setTimestamp()
+    .setColor('#00FF00');
 
-  await sendVerificationReport(source, targetMember, author, assignedRoles);
+  verificationData[targetMember.user.id] = embed; // Store the embed
+
+  await sendVerificationReport(source, targetMember, embed);
   return reply(`Successfully verified ${targetMember.user.username}`);
 };
 
@@ -95,22 +108,9 @@ async function resolveMember(message, userIdOrMention) {
   return targetMember;
 }
 
-async function sendVerificationReport(source, targetMember, author, assignedRoles) {
+async function sendVerificationReport(source, targetMember, embed) {
   const reportChannel = await source.client.channels.fetch(config.reportChannelId);
   if (!reportChannel) return console.error('Report channel not found');
-
-  const embed = new EmbedBuilder()
-    .setTitle('User Verified')
-    .setDescription(`A user has been verified.`)
-    .addFields(
-      { name: 'User', value: `${targetMember.user.tag} (${targetMember.user.id})`, inline: true },
-      { name: 'Verified By', value: `${author.tag} (${author.id})`, inline: true },
-      { name: 'Date', value: new Date().toLocaleString(), inline: true },
-      { name: 'Assigned Roles', value: assignedRoles.length > 0 ? assignedRoles.join(', ') : 'None', inline: false }
-    )
-    .setThumbnail(targetMember.user.displayAvatarURL({ dynamic: true }))
-    .setTimestamp()
-    .setColor('#00FF00');
 
   await reportChannel.send({ embeds: [embed] });
 }
