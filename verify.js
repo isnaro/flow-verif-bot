@@ -11,6 +11,8 @@ const roleMapping = {
   learning_spanish: '1201137753295962112',
   tamazight: '1200592759438987374',
   learning_tamazight: '1201138020569600000',
+  female: '1200592378671681666',
+  male: '1200591829754712145'
 };
 
 const verificationData = {}; // In-memory storage for verification details
@@ -36,6 +38,8 @@ module.exports = async (client, source, args = []) => {
       learning_spanish: source.options.getString('learning_spanish') === 'add',
       tamazight: source.options.getString('tamazight') === 'add',
       learning_tamazight: source.options.getString('learning_tamazight') === 'add',
+      female: source.options.getString('female') === 'add',
+      male: source.options.getString('male') === 'add'
     };
   } else { // Prefix command
     if (source.channel.id !== config.allowedChannelId) return;

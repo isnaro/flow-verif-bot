@@ -116,6 +116,20 @@ async function registerSlashCommands() {
           type: 3, // STRING type
           required: false,
           choices: [{ name: 'Add', value: 'add' }]
+        },
+        {
+          name: 'female',
+          description: 'Assign Female role?',
+          type: 3, // STRING type
+          required: false,
+          choices: [{ name: 'Add', value: 'add' }]
+        },
+        {
+          name: 'male',
+          description: 'Assign Male role?',
+          type: 3, // STRING type
+          required: false,
+          choices: [{ name: 'Add', value: 'add' }]
         }
       ],
     },
