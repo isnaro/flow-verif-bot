@@ -22,9 +22,10 @@ module.exports = async (client, source, args = []) => {
   let options = {};
 
   if (source.isCommand && source.isCommand()) { // Slash command
+    await source.deferReply({ ephemeral: true });
     targetMember = source.options.getMember('user');
     author = source.user;
-    reply = (content) => source.reply({ content, ephemeral: true });
+    reply = (content) => source.followUp({ content, ephemeral: true });
     options = {
       foreign: source.options.getString('foreign') === 'add',
       english: source.options.getString('english') === 'add',
@@ -79,7 +80,7 @@ module.exports = async (client, source, args = []) => {
   verificationData[targetMember.user.id] = verificationDetails; // Store verification details
 
   await sendVerificationReport(source, targetMember, author, assignedRoles);
-  reply(`Successfully verified ${targetMember.user.username}`);
+  return reply(`Successfully verified ${targetMember.user.username}`);
 };
 
 async function resolveMember(message, userIdOrMention) {

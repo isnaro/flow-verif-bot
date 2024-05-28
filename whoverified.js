@@ -2,16 +2,17 @@ const { EmbedBuilder } = require('discord.js');
 const { verificationData } = require('./verify');
 
 module.exports = async (client, interaction) => {
+  await interaction.deferReply({ ephemeral: true });
   const targetUser = interaction.options.getUser('user');
 
   if (!targetUser) {
-    return interaction.reply({ content: 'No user found.', ephemeral: true });
+    return interaction.followUp({ content: 'No user found.', ephemeral: true });
   }
 
   const verificationDetails = verificationData[targetUser.id];
 
   if (!verificationDetails) {
-    return interaction.reply({ content: 'No verification details found for this user.', ephemeral: true });
+    return interaction.followUp({ content: 'No verification details found for this user.', ephemeral: true });
   }
 
   const embed = new EmbedBuilder()
@@ -26,5 +27,5 @@ module.exports = async (client, interaction) => {
     .setTimestamp()
     .setColor('#00FF00');
 
-  interaction.reply({ embeds: [embed], ephemeral: true });
+  interaction.followUp({ embeds: [embed], ephemeral: true });
 };
