@@ -14,73 +14,59 @@ const roleMapping = {
 };
 
 module.exports = async (client, source, args = []) => {
-  try {
-    let targetMember;
-    let author;
-    let reply;
-    let options = {};
-    let sourceMember;
+  let targetMember;
+  let author;
+  let reply;
+  let options = {};
 
-    if (source.isCommand && source.isCommand()) { // Slash command
-      await source.deferReply({ ephemeral: true });
-      targetMember = source.options.getMember('user');
-      author = source.user;
-      sourceMember = source.member;
-      reply = (content) => source.followUp({ content, ephemeral: true });
-      options = {
-        foreign: source.options.getBoolean('foreign'),
-        english: source.options.getBoolean('english'),
-        learning_english: source.options.getBoolean('learning_english'),
-        french: source.options.getBoolean('french'),
-        learning_french: source.options.getBoolean('learning_french'),
-        spanish: source.options.getBoolean('spanish'),
-        learning_spanish: source.options.getBoolean('learning_spanish'),
-        tamazight: source.options.getBoolean('tamazight'),
-        learning_tamazight: source.options.getBoolean('learning_tamazight'),
-      };
-    } else { // Prefix command
-      if (source.channel.id !== process.env.ALLOWED_CHANNEL_ID) return;
-      const userIdOrMention = args[0];
-      targetMember = await resolveMember(source, userIdOrMention);
-      author = source.author;
-      sourceMember = source.member;
-      reply = (content) => source.reply(content);
-    }
+  if (source.isCommand && source.isCommand()) { // Slash command
+    targetMember = source.options.getMember('user');
+    author = source.user;
+    reply = (content) => source.reply({ content, ephemeral: true });
+    options = {
+      foreign: source.options.getString('foreign') === 'add',
+      english: source.options.getString('english') === 'add',
+      learning_english: source.options.getString('learning_english') === 'add',
+      french: source.options.getString('french') === 'add',
+      learning_french: source.options.getString('learning_french') === 'add',
+      spanish: source.options.getString('spanish') === 'add',
+      learning_spanish: source.options.getString('learning_spanish') === 'add',
+      tamazight: source.options.getString('tamazight') === 'add',
+      learning_tamazight: source.options.getString('learning_tamazight') === 'add',
+    };
+  } else { // Prefix command
+    if (source.channel.id !== config.allowedChannelId) return;
+    const userIdOrMention = args[0];
+    targetMember = await resolveMember(source, userIdOrMention);
+    author = source.author;
+    reply = (content) => source.reply(content);
+  }
 
-    if (!targetMember) {
-      return reply(`No user found matching ${args[0]}`);
-    }
+  if (!targetMember) {
+    return reply(`No user found matching ${args[0]}`);
+  }
 
-    if (!targetMember.roles.cache.has(process.env.NON_VERIFIED_ROLE_ID)) {
-      return reply('This user is already verified.');
-    }
+  if (!targetMember.roles.cache.has(config.nonVerifiedRoleId)) {
+    return reply('This user is already verified.');
+  }
 
-    const hasPermission = sourceMember.roles.cache.some(role => config.allowedRoles.includes(role.id));
-    if (!hasPermission) {
-      return reply('You do not have permission to use this command.');
-    }
+  const hasPermission = source.member.roles.cache.some(role => config.allowedRoles.includes(role.id));
+  if (!hasPermission) {
+    return reply('You do not have permission to use this command.');
+  }
 
-    await targetMember.roles.remove(process.env.NON_VERIFIED_ROLE_ID);
+  await targetMember.roles.remove(config.nonVerifiedRoleId);
 
-    const assignedRoles = [];
-    for (const [roleName, roleId] of Object.entries(roleMapping)) {
-      if (options[roleName]) {
-        await targetMember.roles.add(roleId);
-        assignedRoles.push(roleName.replace('_', ' '));
-      }
-    }
-
-    await sendVerificationReport(source, targetMember, author, assignedRoles);
-    return reply(`Successfully verified ${targetMember.user.username}`);
-  } catch (error) {
-    console.error('Error verifying user:', error);
-    if (source.isCommand && source.isCommand()) {
-      return source.followUp({
-        content: 'An error has occurred. Please check the console for details.',
-        ephemeral: true,
-      });
+  const assignedRoles = [];
+  for (const [roleName, roleId] of Object.entries(roleMapping)) {
+    if (options[roleName]) {
+      await targetMember.roles.add(roleId);
+      assignedRoles.push(roleName.replace('_', ' '));
     }
   }
+
+  await sendVerificationReport(source, targetMember, author, assignedRoles);
+  reply(`Successfully verified ${targetMember.user.username}`);
 };
 
 async function resolveMember(message, userIdOrMention) {
@@ -96,7 +82,7 @@ async function resolveMember(message, userIdOrMention) {
 }
 
 async function sendVerificationReport(source, targetMember, author, assignedRoles) {
-  const reportChannel = await source.client.channels.fetch(process.env.REPORT_CHANNEL_ID);
+  const reportChannel = await source.client.channels.fetch(config.reportChannelId);
   if (!reportChannel) return console.error('Report channel not found');
 
   const embed = new EmbedBuilder()
