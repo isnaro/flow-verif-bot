@@ -24,10 +24,25 @@ module.exports = async (client, source, args = []) => {
   let options = {};
 
   if (source.isCommand && source.isCommand()) { // Slash command
-    await source.deferReply({ ephemeral: true });
+    try {
+      await source.deferReply({ ephemeral: true });
+    } catch (error) {
+      console.error('Error deferring reply:', error);
+      return;
+    }
     targetMember = source.options.getMember('user');
     author = source.user;
-    reply = (content) => source.followUp({ content, ephemeral: true });
+    reply = async (content) => {
+      try {
+        if (source.replied || source.deferred) {
+          await source.followUp({ content, ephemeral: true });
+        } else {
+          await source.reply({ content, ephemeral: true });
+        }
+      } catch (error) {
+        console.error('Error sending reply:', error);
+      }
+    };
     options = {
       foreign: source.options.getString('foreign') === 'add',
       english: source.options.getString('english') === 'add',
@@ -46,7 +61,7 @@ module.exports = async (client, source, args = []) => {
     const userIdOrMention = args[0];
     targetMember = await resolveMember(source, userIdOrMention);
     author = source.author;
-    reply = (content) => source.reply(content);
+    reply = async (content) => source.reply(content);
   }
 
   if (!targetMember) {
