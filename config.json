@@ -1,9 +1,9 @@
 {
-    "nonVerifiedRoleId": "1200771376592736256",
-    "allowedChannelId": "1201153567491358860",
-    "reportChannelId": "1244698736169455729",
-    "allowedRoles": ["1226167494226608198", "1226166868952350721"],
-    "guildId": "758051172803411998",
-    "prefix": "?"
-  }
-  
+  "nonVerifiedRoleId": "1200771376592736256",
+  "allowedChannelId": "1201153567491358860",
+  "reportChannelId": "1244698736169455729",
+  "allowedRoles": ["1226167494226608198", "1226166868952350721"],
+  "guildId": "758051172803411998",
+  "prefix": "?",
+  "boostChannelId": "1201162198647590952"
+}

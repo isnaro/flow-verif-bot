@@ -13,6 +13,8 @@ const client = new Client({
 });
 
 client.commands = new Collection();
+
+// Load command files
 const commandsPath = path.join(__dirname, 'commands');
 const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
 
@@ -36,7 +38,7 @@ client.on('messageCreate', async message => {
   const command = args.shift().toLowerCase();
 
   if (command === 'verify') {
-    require('./verify')(client, message, args);
+    require('./commands/verify')(client, message, args);
   }
 });
 
